@@ -14,6 +14,7 @@
                 <b-navbar-nav>
                     <b-nav-item to="/about">About</b-nav-item>
                     <b-nav-item to="/cats">Cats</b-nav-item>
+                    <b-nav-item to="/create-cat">Create Cat</b-nav-item>
                 </b-navbar-nav>
 
                 <!-- Right aligned nav items -->

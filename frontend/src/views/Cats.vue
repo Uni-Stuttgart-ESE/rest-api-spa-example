@@ -7,7 +7,11 @@
             </b-alert>
 
             <div class="catBox" v-for="cat in cats" v-bind:key="cat.id">
-                <h3>{{ cat.name }}</h3>
+                <h3>
+                    <router-link :to="'/cats/' + cat.id">{{
+                        cat.name
+                    }}</router-link>
+                </h3>
                 <p>Age: {{ cat.ageInYears }} years</p>
                 <b-img
                     v-bind:alt="cat.name"
@@ -38,7 +42,7 @@ import axios from "axios";
 import { showToastMessage } from "../js/util";
 
 export default {
-    name: "Home",
+    name: "Cats",
     data() {
         return {
             cats: [],
