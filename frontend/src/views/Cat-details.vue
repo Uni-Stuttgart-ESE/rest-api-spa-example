@@ -56,6 +56,16 @@ export default {
         };
     },
     methods: {
+        getCatDetails() {
+            axios
+                .get(`${config.apiBaseUrl}/cats/${this.$route.params.id}`)
+                .then((response) => {
+                    // log response data to the browser console
+                    console.log(response.data);
+                    // assign response to data variable
+                    this.cat = response.data;
+                });
+        },
         // executed on form submit
         onSubmit: function (event) {
             event.preventDefault();
@@ -105,14 +115,14 @@ export default {
 
     // executed after the component has been started
     created: function () {
-        axios
-            .get(`${config.apiBaseUrl}/cats/${this.$route.params.id}`)
-            .then((response) => {
-                // log response data to the browser console
-                console.log(response.data);
-                // assign response to data variable
-                this.cat = response.data;
-            });
+        this.getCatDetails();
+    },
+    watch: {
+        $route(to, from) {
+            if (to.name === from.name) {
+                this.getCatDetails();
+            }
+        }
     }
 };
 </script>
