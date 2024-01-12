@@ -5,6 +5,7 @@ import config from "@/config";
 import {showToast, Toast} from "@/ts/toasts";
 import {faCheck, faXmark} from "@fortawesome/free-solid-svg-icons";
 import {onMounted, type Ref, ref} from "vue";
+import {useRouter} from 'vue-router';
 
 interface Cat {
   id: number;
@@ -13,6 +14,7 @@ interface Cat {
   picUrl: string;
 }
 
+const router = useRouter();
 const cats: Ref<Cat[]> = ref([]);
 
 function fetchAllCats() {
@@ -51,8 +53,12 @@ onMounted(() => fetchAllCats());
       <p>Age: {{ cat.ageInYears }} years</p>
       <img v-bind:alt="cat.name" v-bind:src="cat.picUrl" class="catLogo"/>
       <div>
+        <Button class="btnEdit" @click="router.push(`/cats/${cat.id}`)">
+          <FontAwesomeIcon class="mie4" icon="pen-to-square"/>
+          Edit
+        </Button>
         <Button @click="deleteCat(cat.id)" mode="secondary">
-          <FontAwesomeIcon icon="trash"/>
+          <FontAwesomeIcon class="mie4" icon="trash"/>
           Delete
         </Button>
       </div>
@@ -78,4 +84,9 @@ onMounted(() => fetchAllCats());
 .catBox button {
   margin: 5px;
 }
+.btnEdit {
+  background-color: var(--agnostic-warning-light);
+  border-color: var(--agnostic-warning-light);
+  color: var(--agnostic-btn-secondary-color, var(--agnostic-light));
+  }
 </style>

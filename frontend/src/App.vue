@@ -21,6 +21,9 @@ import "agnostic-vue/dist/index.css";
           <HeaderNavItem>
             <RouterLink to="/cats">Cats</RouterLink>
           </HeaderNavItem>
+          <HeaderNavItem>
+            <RouterLink to="/create-cat">Create Cat</RouterLink>
+          </HeaderNavItem>
         </HeaderNav>
       </template>
     </Header>
