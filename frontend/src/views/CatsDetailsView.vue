@@ -11,6 +11,7 @@ const router = useRouter();
 const route = useRoute();
 const catId = ref(route.params.id);
 const isLoading = ref(true);
+const pageState = ref("LOADING")
 
 let cat = {
     name: "",
@@ -51,12 +52,21 @@ function deleteCat() {
 
 function getCatDetails(id) {
     fetch(`${config.apiBaseUrl}/cats/${id}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to fetch cat with ID ${catId}`);
+            }
+            return response.json();
+        })
         .then(data => {
             cat = data;
             isLoading.value = false;
+            pageState.value = "CAT_DISPLAY"
         })
-        .catch(error => showToast(new Toast("Error", error, "error", faXmark, 10)));
+        .catch(error => {
+            showToast(new Toast("Error", error, "error", faXmark, 10));
+            pageState.value = "NOT_FOUND";
+        });
 }
 
 onMounted(() => getCatDetails(catId.value));
@@ -66,11 +76,11 @@ onMounted(() => getCatDetails(catId.value));
     <div class="mainContent">
         <h1>Details of cat with ID {{ catId }}</h1>
         <div>
-            <div v-if="isLoading">
+            <div v-if="pageState == 'LOADING'">
                 <Spinner />
                 Loading...
             </div>
-            <div v-else>
+            <div v-if="pageState == 'CAT_DISPLAY'">
                 <img v-bind:alt="cat.name" v-bind:src="cat.picUrl" class="catLogo" />
                 <form @submit.prevent="putCat()">
                     <Input id="name" v-model="cat.name" placeholder="Enter name…" label="Name" type="text" required />
@@ -95,6 +105,12 @@ onMounted(() => getCatDetails(catId.value));
                     </div>
                 </form>
             </div>
+            <div v-if="pageState == 'NOT_FOUND'">
+                <div>
+                    Sorry, but this cat is in another castle.
+                    We could not find any cats with the ID {{ catId }}.
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -106,6 +122,10 @@ onMounted(() => getCatDetails(catId.value));
     display: block;
     margin-left: auto;
     margin-right: auto;
+}
+
+.notFoundCat {
+    height: 200px;
 }
 
 .mainContent {
