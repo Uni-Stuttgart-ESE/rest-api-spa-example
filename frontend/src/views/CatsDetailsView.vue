@@ -7,11 +7,16 @@ import { useRouter, useRoute } from 'vue-router';
 import { onMounted, type Ref, ref } from "vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
+enum PageState {
+    LOADING,
+    CAT_FOUND,
+    NOT_FOUND
+}
+
 const router = useRouter();
 const route = useRoute();
 const catId = ref(route.params.id);
-const isLoading = ref(true);
-const pageState = ref("LOADING")
+const pageState = ref(PageState.LOADING)
 
 let cat = {
     name: "",
@@ -54,18 +59,17 @@ function getCatDetails(id) {
     fetch(`${config.apiBaseUrl}/cats/${id}`)
         .then(response => {
             if (!response.ok) {
-                throw new Error(`Failed to fetch cat with ID ${catId}`);
+                throw new Error(`Failed to fetch cat with ID ${catId.value}`);
             }
             return response.json();
         })
         .then(data => {
             cat = data;
-            isLoading.value = false;
-            pageState.value = "CAT_DISPLAY"
+            pageState.value = PageState.CAT_FOUND;
         })
         .catch(error => {
             showToast(new Toast("Error", error, "error", faXmark, 10));
-            pageState.value = "NOT_FOUND";
+            pageState.value = PageState.NOT_FOUND;
         });
 }
 
@@ -76,11 +80,11 @@ onMounted(() => getCatDetails(catId.value));
     <div class="mainContent">
         <h1>Details of cat with ID {{ catId }}</h1>
         <div>
-            <div v-if="pageState == 'LOADING'">
+            <div v-if="pageState == PageState.LOADING">
                 <Spinner />
                 Loading...
             </div>
-            <div v-if="pageState == 'CAT_DISPLAY'">
+            <div v-else-if="pageState == PageState.CAT_FOUND">
                 <img v-bind:alt="cat.name" v-bind:src="cat.picUrl" class="catLogo" />
                 <form @submit.prevent="putCat()">
                     <Input id="name" v-model="cat.name" placeholder="Enter name…" label="Name" type="text" required />
@@ -105,11 +109,12 @@ onMounted(() => getCatDetails(catId.value));
                     </div>
                 </form>
             </div>
-            <div v-if="pageState == 'NOT_FOUND'">
-                <div>
-                    Sorry, but this cat is in another castle.
-                    We could not find any cats with the ID {{ catId }}.
-                </div>
+            <div v-else-if="pageState == PageState.NOT_FOUND">
+                Sorry, but this cat is in another castle.
+                We could not find any cats with the ID {{ catId }}.
+            </div>
+            <div v-else>
+                This page state should not be reachable. If you still managed to do so, congrats!
             </div>
         </div>
     </div>
