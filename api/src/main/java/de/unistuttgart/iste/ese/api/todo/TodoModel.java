@@ -10,8 +10,6 @@ import org.jpmml.evaluator.TargetField;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +20,6 @@ import java.util.Map;
  */
 public class TodoModel {
     private static final Log LOG = LogFactory.getLog(TodoModel.class);
-    private final String MODEL_PATH;
     private Evaluator evaluator;
 
     /**
@@ -31,9 +28,6 @@ public class TodoModel {
      * @param pathname The path to the PMML model file.
      */
     public TodoModel(String pathname) {
-        ClassLoader classLoader = getClass().getClassLoader();
-        String modelPath = classLoader.getResource(pathname).getFile();
-        this.MODEL_PATH = modelPath;
         loadModel();
     }
 
@@ -46,11 +40,10 @@ public class TodoModel {
     public void loadModel() {
         // Building a model evaluator from a PMML file
         try {
-            Evaluator evaluator = new LoadingModelEvaluatorBuilder()
-                    .load(new File(this.MODEL_PATH))
-                    .build();
-            this.evaluator = evaluator;
-        } catch (IOException | ParserConfigurationException | SAXException | JAXBException e) {
+            this.evaluator = new LoadingModelEvaluatorBuilder()
+                .load(getClass().getClassLoader().getResourceAsStream("model.pmml"))
+                .build();
+        } catch (ParserConfigurationException | SAXException | JAXBException e) {
             LOG.error("Could not load AI model:", e);
             this.evaluator = null;
         }
