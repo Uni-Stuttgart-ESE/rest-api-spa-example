@@ -62,10 +62,8 @@ public class TodoModel {
         List<OutputField> outputFields = this.evaluator.getOutputFields();
 
         int predictedLabelIndex = Integer.parseInt(results.get(outputFields.get(2).getName()).toString());
-        String[] targetLabels = targetFields.get(0).getName().replaceAll("\\[|'|\\]", "").split(" ");
-        String predictedLabel = targetLabels[predictedLabelIndex];
-
-        return predictedLabel;
+        String[] targetLabels = targetFields.get(0).getName().replaceAll("[\\['\\]]", "").split(" ");
+        return targetLabels[predictedLabelIndex];
     }
 
     /**
@@ -86,9 +84,8 @@ public class TodoModel {
 
         // Predict class and parse results
         Map<String, ?> results = this.evaluator.evaluate(input);
-        String predictedClassString = parseModelOutput(results);
 
-        return predictedClassString;
+        return parseModelOutput(results);
     }
 
     /**

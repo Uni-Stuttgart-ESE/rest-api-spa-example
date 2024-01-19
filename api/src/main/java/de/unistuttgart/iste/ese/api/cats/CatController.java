@@ -6,7 +6,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,9 +16,12 @@ import java.util.List;
 @ApiVersion1
 public class CatController {
     private static final Log LOG = LogFactory.getLog(CatController.class);
+    
+    private final CatRepository catRepository;
 
-    @Autowired
-    private CatRepository catRepository;
+    public CatController(CatRepository catRepository) {
+        this.catRepository = catRepository;
+    }
 
     // executed after start-up and dependency injection
     @PostConstruct
@@ -41,8 +43,7 @@ public class CatController {
     // get all cats
     @GetMapping("/cats")
     public List<Cat> getCats() {
-        List<Cat> allCats = (List<Cat>) catRepository.findAll();
-        return allCats;
+        return (List<Cat>) catRepository.findAll();
     }
 
     // get a prediction for a sample todo task
@@ -79,8 +80,7 @@ public class CatController {
     public Cat createCat(@Valid @RequestBody Cat requestBody) {
         Cat cat = new Cat(requestBody.getName(), requestBody.getAgeInYears(),
                 requestBody.getPicUrl());
-        Cat savedCat = catRepository.save(cat);
-        return savedCat;
+        return catRepository.save(cat);
     }
 
     // update a cat
@@ -89,8 +89,7 @@ public class CatController {
         requestBody.setId(id);
         Cat catToUpdate = catRepository.findById(id);
         if (catToUpdate != null) {
-            Cat savedCat = catRepository.save(requestBody);
-            return savedCat;
+            return catRepository.save(requestBody);
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND,
                 String.format("Cat with ID %s not found!", id));
