@@ -1,26 +1,27 @@
 package de.unistuttgart.iste.ese.api.todo;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
-
+import jakarta.xml.bind.JAXBException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jpmml.evaluator.Evaluator;
 import org.jpmml.evaluator.LoadingModelEvaluatorBuilder;
 import org.jpmml.evaluator.OutputField;
 import org.jpmml.evaluator.TargetField;
 import org.xml.sax.SAXException;
 
-import jakarta.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
  * A class for loading and using a PMML-based Todo classification model.
  */
 public class TodoModel {
+    private static final Log LOG = LogFactory.getLog(TodoModel.class);
     private final String MODEL_PATH;
     private Evaluator evaluator;
 
@@ -50,7 +51,7 @@ public class TodoModel {
                     .build();
             this.evaluator = evaluator;
         } catch (IOException | ParserConfigurationException | SAXException | JAXBException e) {
-            e.printStackTrace();
+            LOG.error("Could not load AI model:", e);
             this.evaluator = null;
         }
     }
@@ -81,6 +82,11 @@ public class TodoModel {
      * @return The predicted class/category for the input text.
      */
     public String predictClass(String inputString) {
+        if (evaluator == null) {
+            LOG.warn("Cannot predict class without a loaded model");
+            return "unknown";
+        }
+
         // Prepare the input data
         Map<String, Object> input = new HashMap<>();
         input.put("text", inputString);

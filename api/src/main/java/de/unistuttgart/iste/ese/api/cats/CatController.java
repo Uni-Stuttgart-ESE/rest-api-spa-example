@@ -4,6 +4,8 @@ import de.unistuttgart.iste.ese.api.ApiVersion1;
 import de.unistuttgart.iste.ese.api.todo.TodoModel;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ import java.util.List;
 @RestController
 @ApiVersion1
 public class CatController {
+    private static final Log LOG = LogFactory.getLog(CatController.class);
 
     @Autowired
     private CatRepository catRepository;
@@ -52,7 +55,7 @@ public class CatController {
 
         String prediction = todoModel.predictClass(sampleText);
 
-        System.out.println(sampleText + " | Predicted class: " + prediction);
+        LOG.info(sampleText + " | Predicted class: " + prediction);
         todoModel.unloadModel();
 
         return prediction;
