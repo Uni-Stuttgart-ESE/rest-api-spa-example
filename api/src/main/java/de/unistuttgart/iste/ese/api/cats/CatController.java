@@ -1,6 +1,7 @@
 package de.unistuttgart.iste.ese.api.cats;
 
 import de.unistuttgart.iste.ese.api.ApiVersion1;
+import de.unistuttgart.iste.ese.api.todo.TodoModel;
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,22 @@ public class CatController {
     public List<Cat> getCats() {
         List<Cat> allCats = (List<Cat>) catRepository.findAll();
         return allCats;
+    }
+
+    // get a prediction for a sample todo task
+    @GetMapping("/classify")
+    public String todoModel() {
+        String sampleText = "Take care of my cat.";
+        String modelPath = "model.pmml";
+
+        TodoModel todoModel = new TodoModel(modelPath);
+
+        String prediction = todoModel.predictClass(sampleText);
+
+        System.out.println(sampleText + " | Predicted class: " + prediction);
+        todoModel.unloadModel();
+
+        return prediction;
     }
 
     // get a single cat
